@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.gson.Gson;
+
 import java.text.DateFormat;
 import java.util.Date;
 
@@ -52,6 +54,7 @@ public class AddNote extends AppCompatActivity {
         Gson gson = new Gson();
         //將Book物件轉成JSON
         String json = gson.toJson(note);
+        Log.d("app",json);
         //noteDao.insert(note);
         //Log.d("DaoExample", "Inserted new note, ID: " + note.getId());
 

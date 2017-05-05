@@ -19,7 +19,7 @@ public class Note {
     //@Id
     private Long id;
 
-    private String text;
+    private String content;
     private String comment;
     private java.util.Date date;
     private String title;
@@ -37,7 +37,7 @@ public class Note {
     //@Keep
     public Note(Long id, String text, String comment, java.util.Date date, String title) {
         this.id = id;
-        this.text = text;
+        this.content = text;
         this.comment = comment;
         this.date = date;
         this.title = title;
@@ -53,12 +53,12 @@ public class Note {
 
 
     public String getText() {
-        return text;
+        return content;
     }
 
     /** Not-null value; ensure this value is available before it is saved to the database. */
     public void setText(String text) {
-        this.text = text;
+        this.content = text;
     }
 
     public String getComment() {

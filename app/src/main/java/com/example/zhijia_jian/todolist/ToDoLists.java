@@ -29,7 +29,7 @@ public class ToDoLists extends AppCompatActivity {
 
         setUpViews();
         Bundle bun = this.getIntent().getExtras();
-        token=bun.getString("token");
+        //token=bun.getString("token");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
