@@ -1,6 +1,8 @@
 package com.example.zhijia_jian.todolist;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.util.SortedList;
@@ -45,6 +47,26 @@ public class Login extends AppCompatActivity {
 
 
         showclient =(TextView)findViewById(R.id.tv3);
+
+        lButton.setOnClickListener(new Button.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                handleLoginButton();
+            }
+        });
+
+        sButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                handleSignupButton();
+            }
+        });
+
+
+
+    }
+    private void handleSignupButton()
+    {
         final ExecutorService service = Executors.newFixedThreadPool(10);
 
         OkHttpClient.Builder b = new OkHttpClient.Builder();
@@ -52,110 +74,94 @@ public class Login extends AppCompatActivity {
         b.writeTimeout(600, TimeUnit.MILLISECONDS);
 
         final OkHttpClient client = b.build();
-
-
-
-        lButton.setOnClickListener(new Button.OnClickListener(){
-
+        final String name= nameET.getText().toString();
+        final String pass=pwET.getText().toString();
+        service.execute(new Runnable() {
             @Override
-            public void onClick(View v) {
-                final String name= nameET.getText().toString();
-                final String pass=pwET.getText().toString();
-                service.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        RequestBody formBody = new FormBody.Builder()
-                                .add("username", name)
-                                .add("password", pass)
-                                .build();
-                        Request request = new Request.Builder()
-                                .url("https://todolist-token.herokuapp.com/user/login")
-                                .post(formBody)
-                                .build();
-                        try {
-                            final Response response = client.newCall(request).execute();
-                            final String resStr = response.body().string();
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    showclient.setText(resStr);
-                                }
-                            });
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
+            public void run() {
+                RequestBody formBody = new FormBody.Builder()
+                        .add("username", name)
+                        .add("password", pass)
+                        .build();
+                Request request = new Request.Builder()
+                        .url("https://todolist-token.herokuapp.com/user/register")
+                        .post(formBody)
+                        .build();
+                try {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showclient.setText("註冊中...");
                         }
-                    }
-                });
-                service.shutdown();
-            }
-//            @Override
-//            public void onClick(View v) {
-//                // TODO Auto-generated method stub
-//                String name= nameET.getText().toString();
-//                String pass=pwET.getText().toString();
-//
-//                Intent intent = new Intent();
-//                intent.setClass(Login.this , signUpPage.class);
-//                Bundle bun=new Bundle();
-//                bun.putString("name",name);
-//                bun.putString("password",pass);
-//                intent.putExtras(bun);
-//                startActivity(intent);
-//            }
+                    });
 
-        });
-
-
-
-        sButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                final String name= nameET.getText().toString();
-                final String pass=pwET.getText().toString();
-                service.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        RequestBody formBody = new FormBody.Builder()
-                                .add("username", name)
-                                .add("password", pass)
-                                .build();
-                        Request request = new Request.Builder()
-                                .url("https://todolist-token.herokuapp.com/user/register")
-                                .post(formBody)
-                                .build();
-                        try {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    showclient.setText("註冊中...");
-                                }
-                            });
-
-                            Log.d("app", "run: execute");
-                            final Response response = client.newCall(request).execute();
-                            final String resStr = response.body().string();
-                            Log.d("app", "run: resStr: " + resStr);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Log.d("app", "run: execute done");
-                                    showclient.setText(resStr);
-                                }
-                            });
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                    Log.d("app", "run: execute");
+                    final Response response = client.newCall(request).execute();
+                    final String resStr = response.body().string();
+                    Log.d("app", "run: resStr: " + resStr);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("app", "run: execute done");
+                            showclient.setText(resStr);
                         }
-                    }
-                });
-                //service.shutdown();
+                    });
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
-
-
+        service.shutdown();
 
     }
+    private void handleLoginButton()
+    {
+        final ExecutorService service = Executors.newFixedThreadPool(10);
+
+        OkHttpClient.Builder b = new OkHttpClient.Builder();
+        b.readTimeout(1000*20, TimeUnit.MILLISECONDS);
+        b.writeTimeout(600, TimeUnit.MILLISECONDS);
+
+        final OkHttpClient client = b.build();
+        final String name= nameET.getText().toString();
+        final String pass=pwET.getText().toString();
+        service.execute(new Runnable() {
+            @Override
+            public void run() {
+                RequestBody formBody = new FormBody.Builder()
+                        .add("username", name)
+                        .add("password", pass)
+                        .build();
+                Request request = new Request.Builder()
+                        .url("https://todolist-token.herokuapp.com/user/login")
+                        .post(formBody)
+                        .build();
+                try {
+                    final Response response = client.newCall(request).execute();
+                    final String resStr = response.body().string();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            final String token=resStr.substring(resStr.indexOf(':')+2,resStr.length()-2);
+                            showclient.setText(resStr+"\n"+token);
+
+                            Intent intent = new Intent();
+                            intent.setClass(Login.this , ToDoLists.class);
+                            Bundle bun=new Bundle();
+                            bun.putString("token",token);
+                            intent.putExtras(bun);
+                            startActivity(intent);
+                        }
+                    });
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        service.shutdown();
+    }
+
 
 }
