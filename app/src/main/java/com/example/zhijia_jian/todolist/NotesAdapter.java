@@ -22,12 +22,12 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
 
         public TextView title;
         public TextView text;
-        public TextView comment;
+        //public TextView comment;
 
         public NoteViewHolder(View itemView, final NoteClickListener clickListener) {
             super(itemView);
             text = (TextView) itemView.findViewById(R.id.textTV);
-            comment = (TextView) itemView.findViewById(R.id.timeTV);
+            //comment = (TextView) itemView.findViewById(R.id.timeTV);
             title =(TextView)  itemView.findViewById(R.id.titleTV);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -66,7 +66,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         Note note = dataset.get(position);
         holder.title.setText(note.getTitle());
         holder.text.setText(note.getText());
-        holder.comment.setText(note.getComment());
+        //holder.comment.setText(note.getComment());
     }
 
     @Override

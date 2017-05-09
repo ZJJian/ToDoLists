@@ -28,6 +28,7 @@
         android:layout_height="wrap_content"
         android:hint="Username"
         android:textSize="20dp"
+        android:text="haha"
         android:layout_marginTop="30dp"
         android:layout_below="@id/tv2"
         android:id="@+id/nameET" />
@@ -37,6 +38,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/nameET"
+        android:text="1111"
         android:layout_centerHorizontal="true"
         android:ems="10"
         android:textSize="20dp"
