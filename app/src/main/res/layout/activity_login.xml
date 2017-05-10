@@ -4,8 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="40dp"
+    android:background="@color/colorPrimaryDark"
+    app:elevation="0dp"
     tools:context="com.example.zhijia_jian.todolist.Login">
+    <!--android:layout_margin="40dp"-->
 
     <!--<TextView-->
         <!--android:layout_width="wrap_content"-->
@@ -21,27 +23,33 @@
         android:layout_centerHorizontal="true"
         android:text="To Do List"
         android:textSize="60dp"
-        android:layout_marginTop="80dp"
+
+        android:textColor="@color/White"
+        android:layout_marginTop="40dp"
         android:id="@+id/tv2" />
     <EditText
-        android:layout_width="match_parent"
+        android:layout_width="280dp"
         android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
         android:hint="Username"
         android:textSize="20dp"
         android:text="haha"
+        android:background="@color/White"
         android:layout_marginTop="30dp"
         android:layout_below="@id/tv2"
         android:id="@+id/nameET" />
 
     <EditText
         android:id="@+id/passwordET"
-        android:layout_width="match_parent"
+        android:layout_width="280dp"
         android:layout_height="wrap_content"
         android:layout_below="@+id/nameET"
         android:text="1111"
         android:layout_centerHorizontal="true"
         android:ems="10"
         android:textSize="20dp"
+        android:layout_marginTop="3dp"
+        android:background="@color/White"
         android:hint="Password"
         android:inputType="textPassword" />
 
@@ -54,7 +62,7 @@
         android:layout_below="@+id/passwordET"
         android:layout_marginLeft="14dp"
         android:layout_marginStart="14dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="10dp"
         android:text="Log In" />
 
     <Button
@@ -72,8 +80,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
-        android:text="HelloWorld!"
+        android:text=""
+        android:gravity="center_horizontal"
         android:textSize="15dp"
+        android:textColor="@color/White"
+        android:layout_margin="20dp"
         android:layout_below="@id/loginButton"
         android:id="@+id/tv3" />
 

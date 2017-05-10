@@ -2,6 +2,8 @@ package com.example.zhijia_jian.todolist;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -38,13 +40,19 @@ public class ToDoLists extends AppCompatActivity {
     private String token;
     String getJson;
 
+    private SharedPreferences settings;
+    private static final String data = "DATA";
+    private static final String usernameField = "USERNAME";
+    private static final String passwordField = "PASSWORD";
+    private static final String tokenField = "TOKEN";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_to_do_lists);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        settings = getSharedPreferences(data,0);
 
         setUpViews();
         Bundle bun = this.getIntent().getExtras();
@@ -60,7 +68,7 @@ public class ToDoLists extends AppCompatActivity {
                 intent.setClass(ToDoLists.this , AddNote.class);
                 Bundle bun=new Bundle();
                 bun.putString("token",token);
-                bun.putLong("note",-1);
+                bun.putLong("noteId",-1);
                 intent.putExtras(bun);
                 startActivity(intent);
             }
@@ -217,7 +225,7 @@ public class ToDoLists extends AppCompatActivity {
 
         }
     };
-    private AlertDialog getAlertDialog(Note note, String message){
+    private AlertDialog getAlertDialog(final Note note, String message){
 
 
         final Long noteId = note.getId();
@@ -235,8 +243,15 @@ public class ToDoLists extends AppCompatActivity {
                 //按下按鈕時顯示快顯
 
                 //noteDao.deleteByKey(noteId);
+                new DeleteTask().execute(noteId.toString());
                 Log.d("DaoExample", "Deleted note, ID: " + noteId);
-
+                String s=settings.getString(tokenField,"");
+                Log.d("App before clear", s);
+                settings.edit().remove(usernameField).commit();
+                settings.edit().remove(passwordField).commit();
+                settings.edit().remove(tokenField).commit();
+                s=settings.getString(tokenField,"");
+                Log.d("App after clear", s);
                 //updateNotes();
                 Toast.makeText(ToDoLists.this, "You clicked \"delete\"", Toast.LENGTH_SHORT).show();
             }
@@ -249,10 +264,11 @@ public class ToDoLists extends AppCompatActivity {
                 Intent intent = new Intent();
                 intent.setClass(ToDoLists.this , AddNote.class);
                 Bundle bun=new Bundle();
-                bun.putLong("note",noteId);
+                bun.putLong("noteId",noteId);
                 bun.putString("token",token);
+                bun.putString("content",note.getText());
+                bun.putString("title",note.getTitle());
                 intent.putExtras(bun);
-
                 startActivity(intent);
                 //按下按鈕時顯示快顯
                 Toast.makeText(ToDoLists.this, "You clicked \"Edit\"", Toast.LENGTH_SHORT).show();
@@ -260,6 +276,53 @@ public class ToDoLists extends AppCompatActivity {
         });
         //利用Builder物件建立AlertDialog
         return builder.create();
+    }
+    class DeleteTask extends AsyncTask<String, String, String> {
+        protected void onPreExecute(){
+            // in main thread
+        }
+
+        protected String doInBackground(String... params){
+            // in background thread
+
+            OkHttpClient.Builder b = new OkHttpClient.Builder();
+            b.readTimeout(1000*30, TimeUnit.MILLISECONDS);
+            b.writeTimeout(600, TimeUnit.MILLISECONDS);
+
+            final OkHttpClient client = b.build();
+            Request request = new Request.Builder()
+                    .url("https://todolist-token.herokuapp.com/list/"+params[0])
+                    .header("x-access-token",token)
+                    .delete()//
+                    .build();
+            try {
+                Log.d("app", "run: execute");
+                final Response response = client.newCall(request).execute();
+                final String resStr = response.body().string();
+                Log.d("app", "run: resStr: " + resStr);
+                return resStr;
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "";
+            }
+        }
+
+        protected void onProgressUpdate(String... progress){
+            // in main thread
+        }
+
+        protected void onPostExecute(String result){
+            // in main thread
+            //showList();
+            new MyTask().execute(" ");
+        }
+
+        protected void onCancelled(String result){
+            // in main thread
+
+        }
+
     }
 
 }

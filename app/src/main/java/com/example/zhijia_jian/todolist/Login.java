@@ -1,7 +1,9 @@
 package com.example.zhijia_jian.todolist;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -32,6 +35,13 @@ public class Login extends AppCompatActivity {
     private EditText nameET;
     private EditText pwET;
     private TextView showclient;
+    private TextView mainTitle;
+    private SharedPreferences settings;
+    private static final String data = "DATA";
+    private static final String usernameField = "USERNAME";
+    private static final String passwordField = "PASSWORD";
+    private static final String tokenField = "TOKEN";
+
 
 
     @Override
@@ -44,7 +54,9 @@ public class Login extends AppCompatActivity {
         lButton=(Button)findViewById(R.id.loginButton);
         sButton=(Button)findViewById(R.id.signupButton);
 
-
+        mainTitle =(TextView) findViewById(R.id.tv2);
+        mainTitle.setTypeface(Typeface.createFromAsset(getAssets()
+                , "fonts/dolphin.ttf"));
 
         showclient =(TextView)findViewById(R.id.tv3);
 
@@ -63,7 +75,39 @@ public class Login extends AppCompatActivity {
         });
 
 
+        String token=readData();
+        if(token!="")
+        {
+            gotoListPage(token);
+        }
 
+
+
+    }
+    public void gotoListPage(String token)
+    {
+        Intent intent = new Intent();
+        intent.setClass(Login.this , ToDoLists.class);
+        Bundle bun=new Bundle();
+        bun.putString("token",token);
+        intent.putExtras(bun);
+        startActivity(intent);
+        Toast.makeText(Login.this, "Welcome "+ nameET.getText(), Toast.LENGTH_SHORT).show();
+    }
+    public String readData(){
+        settings = getSharedPreferences(data,0);
+        return settings.getString(tokenField,"");
+//        name.setText(settings.getString(nameField, ""));
+//        phone.setText(settings.getString(phoneField, ""));
+//        sex.setText(settings.getString(sexField, ""));
+    }
+    public void saveData(String token){
+        settings = getSharedPreferences(data,0);
+        settings.edit()
+                .putString(usernameField, nameET.getText().toString())
+                .putString(passwordField, pwET.getText().toString())
+                .putString(tokenField,token)
+                .commit();
     }
     private void handleSignupButton()
     {
@@ -91,7 +135,7 @@ public class Login extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            showclient.setText("註冊中...");
+                            showclient.setText("Registering...");
                         }
                     });
 
@@ -103,7 +147,14 @@ public class Login extends AppCompatActivity {
                         @Override
                         public void run() {
                             Log.d("app", "run: execute done");
-                            showclient.setText(resStr);
+                            //showclient.setText(resStr);
+                            if(resStr=="OK") {
+                                handleLoginButton();
+                            }
+                            else
+                            {
+                                showclient.setText("\""+name+"\" has been registered.");
+                            }
                         }
                     });
 
@@ -138,20 +189,22 @@ public class Login extends AppCompatActivity {
                         .post(formBody)
                         .build();
                 try {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showclient.setText("Please wait...");
+                        }
+                    });
                     final Response response = client.newCall(request).execute();
                     final String resStr = response.body().string();
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+
                             final String token=resStr.substring(resStr.indexOf(':')+2,resStr.length()-2);
                             showclient.setText(resStr+"\n"+token);
-
-                            Intent intent = new Intent();
-                            intent.setClass(Login.this , ToDoLists.class);
-                            Bundle bun=new Bundle();
-                            bun.putString("token",token);
-                            intent.putExtras(bun);
-                            startActivity(intent);
+                            saveData(token);
+                            gotoListPage(token);
                         }
                     });
 

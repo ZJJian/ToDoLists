@@ -20,7 +20,7 @@
             android:layout_marginRight="30dp"
             android:id="@+id/titleTV"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="32dp"
             android:textSize="24sp"
             android:textColor="@color/Black"
             android:text="Hello World!"
