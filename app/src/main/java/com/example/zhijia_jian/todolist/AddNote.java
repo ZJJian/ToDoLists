@@ -32,6 +32,7 @@ public class AddNote extends AppCompatActivity {
     private Button addNoteButton;
     private String token;
     private Long noteId;
+    private static final int EDIT=1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,13 +63,14 @@ public class AddNote extends AppCompatActivity {
         Bundle bun=new Bundle();
         bun.putString("token",token);
         intent.putExtras(bun);
-        startActivity(intent);
+        startActivityForResult(intent, EDIT);
+        finish();
     }
     private void editNote() {
         String noteText = editText.getText().toString();
-        editText.setText("");
+        //editText.setText("");
         String textnoteText = texteditText.getText().toString();
-        texteditText.setText("");
+        //texteditText.setText("");
 
 
         Note note = new Note();
@@ -140,9 +142,9 @@ public class AddNote extends AppCompatActivity {
 
     private void addNote() {
         String noteText = editText.getText().toString();
-        editText.setText("");
+        //editText.setText("");
         String textnoteText = texteditText.getText().toString();
-        texteditText.setText("");
+        //texteditText.setText("");
 
         final DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
         String comment = "Added on " + df.format(new Date());

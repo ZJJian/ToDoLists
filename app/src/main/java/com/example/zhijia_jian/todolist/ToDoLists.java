@@ -14,6 +14,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -37,21 +40,28 @@ import okhttp3.Response;
 public class ToDoLists extends AppCompatActivity {
 
     private NotesAdapter notesAdapter;
+    private List<Note> notes;
     private String token;
-    String getJson;
 
+    String getJson;
+    private Toolbar mToolbar;
     private SharedPreferences settings;
     private static final String data = "DATA";
     private static final String usernameField = "USERNAME";
     private static final String passwordField = "PASSWORD";
     private static final String tokenField = "TOKEN";
+    private static final int EDIT=1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_to_do_lists);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+
+
         settings = getSharedPreferences(data,0);
 
         setUpViews();
@@ -73,13 +83,58 @@ public class ToDoLists extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.menu_edit:
+                        handelLogOut();
+                        //Toast.makeText( "Edit is clicked!", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+                return false;
+            }
+        });
     }
+
     @Override
     public void onResume(){
         super.onResume();
 
         setUpViews();
         updateNotes();
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+/*
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_layout, menu);
+        return true;
+*/
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_layout, menu);
+        //MenuItem refresh = menu.getItem(R.id.menu_edit);
+        //refresh.setEnabled(true);
+        return true;
+        //return super.onCreateOptionsMenu(menu);
+    }
+    private void handelLogOut() {
+        String s=settings.getString(tokenField,"");
+        Log.d("App before clear", s);
+        settings.edit().remove(usernameField).commit();
+        settings.edit().remove(passwordField).commit();
+        settings.edit().remove(tokenField).commit();
+        s=settings.getString(tokenField,"");
+        Log.d("App after clear", s);
+
+        Intent intent = new Intent();
+        intent.setClass(ToDoLists.this , Login.class);
+        startActivityForResult(intent, EDIT);
+
 
     }
     private void updateNotes() {
@@ -91,67 +146,11 @@ public class ToDoLists extends AppCompatActivity {
 //        task.cancel(true);
 
     }
-    private void getNotesFromServer()
-    {
-        final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-        final ExecutorService service = Executors.newFixedThreadPool(10);
-        //String getJson;
-        OkHttpClient.Builder b = new OkHttpClient.Builder();
-        b.readTimeout(1000*30, TimeUnit.MILLISECONDS);
-        b.writeTimeout(600, TimeUnit.MILLISECONDS);
-
-        final OkHttpClient client = b.build();
-        //final String name= nameET.getText().toString();
-        //final String pass=pwET.getText().toString();
-        service.execute(new Runnable() {
-            @Override
-            public void run() {
-
-                Request request = new Request.Builder()
-                        .url("https://todolist-token.herokuapp.com/list")
-                        .header("x-access-token",token)
-                        .get()//
-                        .build();
-                try {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //add text here
-                        }
-                    });
-
-                    Log.d("app", "run: execute");
-                    final Response response = client.newCall(request).execute();
-                    final String resStr = response.body().string();
-                    Log.d("app", "run: resStr: " + resStr);
-                    getJson=resStr;
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.d("app", "run: execute done");
-                            showList();
-                            //showclient.setText(resStr);
-                        }
-                    });
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-        });
-
-        service.shutdown();
-        //return getJson;
-        Log.d("app", "getNotesFromServer: end");
-    }
     private  void showList()
     {
         Gson gson = new Gson();
         Type listType = new TypeToken<ArrayList<Note>>(){}.getType();
-        List<Note> notes = gson.fromJson(getJson,listType);
+        notes = gson.fromJson(getJson,listType);
         notesAdapter.setNotes(notes);
 
     }
@@ -243,15 +242,12 @@ public class ToDoLists extends AppCompatActivity {
                 //按下按鈕時顯示快顯
 
                 //noteDao.deleteByKey(noteId);
+                //notes.remove(notes.indexOf(notes));
+                //notesAdapter.setNotes(notes);
                 new DeleteTask().execute(noteId.toString());
                 Log.d("DaoExample", "Deleted note, ID: " + noteId);
-                String s=settings.getString(tokenField,"");
-                Log.d("App before clear", s);
-                settings.edit().remove(usernameField).commit();
-                settings.edit().remove(passwordField).commit();
-                settings.edit().remove(tokenField).commit();
-                s=settings.getString(tokenField,"");
-                Log.d("App after clear", s);
+
+
                 //updateNotes();
                 Toast.makeText(ToDoLists.this, "You clicked \"delete\"", Toast.LENGTH_SHORT).show();
             }

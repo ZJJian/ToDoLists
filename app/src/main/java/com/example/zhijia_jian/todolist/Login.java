@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.util.SortedList;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -43,7 +44,6 @@ public class Login extends AppCompatActivity {
     private static final String tokenField = "TOKEN";
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +76,7 @@ public class Login extends AppCompatActivity {
 
 
         String token=readData();
-        if(token!="")
+        if(!token.equals(""))
         {
             gotoListPage(token);
         }
@@ -92,7 +92,9 @@ public class Login extends AppCompatActivity {
         bun.putString("token",token);
         intent.putExtras(bun);
         startActivity(intent);
-        Toast.makeText(Login.this, "Welcome "+ nameET.getText(), Toast.LENGTH_SHORT).show();
+        settings = getSharedPreferences(data,0);
+        showclient.setText("");
+        Toast.makeText(Login.this, "Welcome "+ settings.getString(usernameField,""), Toast.LENGTH_SHORT).show();
     }
     public String readData(){
         settings = getSharedPreferences(data,0);
@@ -143,12 +145,14 @@ public class Login extends AppCompatActivity {
                     final Response response = client.newCall(request).execute();
                     final String resStr = response.body().string();
                     Log.d("app", "run: resStr: " + resStr);
+                    //showclient.setText(resStr);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             Log.d("app", "run: execute done");
+                            Toast.makeText(Login.this, resStr, Toast.LENGTH_SHORT).show();
                             //showclient.setText(resStr);
-                            if(resStr=="OK") {
+                            if(resStr.trim().equals("OK")) {
                                 handleLoginButton();
                             }
                             else
@@ -202,7 +206,7 @@ public class Login extends AppCompatActivity {
                         public void run() {
 
                             final String token=resStr.substring(resStr.indexOf(':')+2,resStr.length()-2);
-                            showclient.setText(resStr+"\n"+token);
+                            //showclient.setText(resStr+"\n"+token);
                             saveData(token);
                             gotoListPage(token);
                         }
