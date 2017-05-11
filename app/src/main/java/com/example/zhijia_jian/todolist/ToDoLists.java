@@ -42,7 +42,6 @@ public class ToDoLists extends AppCompatActivity {
     private NotesAdapter notesAdapter;
     private List<Note> notes;
     private String token;
-
     String getJson;
     private Toolbar mToolbar;
     private SharedPreferences settings;
@@ -84,7 +83,6 @@ public class ToDoLists extends AppCompatActivity {
             }
         });
         mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()){
@@ -242,8 +240,8 @@ public class ToDoLists extends AppCompatActivity {
                 //按下按鈕時顯示快顯
 
                 //noteDao.deleteByKey(noteId);
-                //notes.remove(notes.indexOf(notes));
-                //notesAdapter.setNotes(notes);
+                notes.remove(getIndex(noteId,notes));
+                notesAdapter.setNotes(notes);
                 new DeleteTask().execute(noteId.toString());
                 Log.d("DaoExample", "Deleted note, ID: " + noteId);
 
@@ -272,6 +270,19 @@ public class ToDoLists extends AppCompatActivity {
         });
         //利用Builder物件建立AlertDialog
         return builder.create();
+    }
+    public int getIndex(Long noteId,List<Note> notes)
+    {
+        for (int i = 0; i < notes.size(); i++)
+        {
+            Note n=notes.get(i);
+            if (n.getId()==noteId)
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
     class DeleteTask extends AsyncTask<String, String, String> {
         protected void onPreExecute(){
@@ -311,7 +322,7 @@ public class ToDoLists extends AppCompatActivity {
         protected void onPostExecute(String result){
             // in main thread
             //showList();
-            new MyTask().execute(" ");
+            //new MyTask().execute(" ");
         }
 
         protected void onCancelled(String result){
